@@ -1,129 +1,131 @@
-# F1 25 Weather Strip — ESP8266 + NeoPixel
+# F1 25 UDP LED Strip
 
-Connect your F1 25 game to a LED strip via an ESP8266. The strip automatically reacts to the weather in your race: clear, rain, storm — the colour adjusts accordingly.
+> **DISCLAIMER**
+>
+> Enabling UDP Telemetry in F1 25 with the settings described in this guide caused my **Moza FSR steering wheel to stop receiving telemetry data**. I restored it by reconfiguring the game profile in the Moza app. With the current setup, you have to choose: either telemetry goes to your racing wheel, or this LED strip works. Both at the same time is not possible without additional configuration on your end.
 
 ---
 
-## What do you need?
+## What does this do?
 
-| Hardware | Software |
+This project uses an ESP8266 microcontroller to receive live UDP telemetry from F1 25 and display race conditions on a NeoPixel LED strip.
+
+| Condition | LED behaviour |
 |---|---|
-| ESP8266 (e.g. NodeMCU) | Arduino IDE |
-| NeoPixel LED strip (14 LEDs) | [f1-26-udp library](https://github.com/MacManley/f1-26-udp) |
-| USB cable | Adafruit NeoPixel library |
-| WiFi network (same as your PC) | F1 25 (PC) |
+| Clear weather | Light yellow |
+| Light cloud | Light blue |
+| Overcast | White |
+| Light rain | Light purple |
+| Heavy rain | Purple |
+| Storm | Dark purple |
+| Safety car (full / virtual / formation) | Yellow blinking |
+| Red flag | Red blinking (10 seconds) |
 
 ---
 
-## Step 1 — Install libraries
+## Hardware requirements
 
-1. Open the **Arduino IDE**
-2. Go to **Sketch → Include Library → Manage Libraries**
-3. Search for `Adafruit NeoPixel` and click **Install**
-4. Download the [f1-26-udp library from GitHub](https://github.com/MacManley/f1-26-udp) as a ZIP file
-5. Go to **Sketch → Include Library → Add .ZIP Library** and select the downloaded file
+- ESP8266 microcontroller (e.g. NodeMCU or Wemos D1 Mini)
+- NeoPixel LED strip (WS2812B or compatible)
+- USB-C cable (to upload the code to the ESP8266)
+- Jumper wires to connect the LED strip to the ESP8266
+
+![Hardware overview](read-me-images/hardware.jpg)
 
 ---
 
-## Step 2 — Connect the hardware
+## Software requirements
 
-Connect the NeoPixel LED strip to the ESP8266:
+- 2.4 GHz Wi-Fi network (the ESP8266 does not support 5 GHz)
+- [Arduino IDE](https://www.arduino.cc/en/software)
+- F1 25 (PC version, main game)
 
+---
+
+## Step 1 - Install the libraries
+
+Two library ZIP files are included in the `libraries/` folder of this repository:
+
+- `Adafruit_NeoPixel-master.zip`
+- `f1-25-udp-main.zip`
+
+To install them in Arduino IDE:
+
+1. Open Arduino IDE.
+2. Go to **Sketch** > **Include Library** > **Add .ZIP Library...**
+3. Select `Adafruit_NeoPixel-master.zip` and click **Open**.
+4. Repeat step 2 and 3 for `f1-25-udp-main.zip`.
+
+![Library install](read-me-images/library-install.jpg)
+
+---
+
+## Step 2 - Download and open the code
+
+1. In the `code_files/` folder of this repository, download `weather_and_safetycar_led.zip`.
+2. Extract the ZIP file to a location of your choice.
+3. Open Arduino IDE.
+4. Go to **File** > **Open** and select the extracted `.ino` file.
+
+![Open file](read-me-images/open-file.jpg)
+
+---
+
+## Step 3 - Configure the code
+
+At the top of the file, change the following values to match your setup:
+
+```cpp
+const char *SSID     = "wifi-ssid";      // Name of your 2.4 GHz Wi-Fi network
+const char *Password = "wifi-password";  // Your Wi-Fi password
 ```
-NeoPixel DATA  →  D1 (GPIO 5)
-NeoPixel VCC   →  3.3V or 5V
-NeoPixel GND   →  GND
+
+```cpp
+#define LED_PIN   5    // Change to D1 or another pin if needed
+#define LED_COUNT 14   // Change to the number of LEDs on your strip
 ```
-![This is supposed to be a picture of the circuit](read-me-images/image.png)
 
-> Note: With more than ~10 LEDs at full brightness, use an external 5V power supply for the strip.
-
----
-
-## Step 3 — Upload the code
-
-Download the Arduino file "f1code" and open it in the Arduino App.
-
-
-Upload the code via **Sketch → Upload**.
+![Code configuration](read-me-images/code-config.jpg)
 
 ---
 
-## Step 4 — Configure F1 25
+## Step 4 - Upload the code
 
-1. Open F1 25
-2. Go to **Settings → Telemetry Settings**
-3. Configure the following:
+1. Connect the ESP8266 to your computer using a USB-C cable.
+2. In Arduino IDE, go to **Tools** > **Board** and select your ESP8266 board (e.g. **NodeMCU 1.0** or **LOLIN(WEMOS) D1 Mini**).
+3. Go to **Tools** > **Port** and select the correct COM port.
+4. Click the **Upload** button (arrow icon).
+
+![Upload](read-me-images/upload.jpg)
+
+---
+
+## Step 5 - Configure F1 25
+
+In F1 25, go to **Settings** > **Telemetry Settings** and apply the following:
 
 | Setting | Value |
 |---|---|
-| UDP Telemetry | **On** |
-| Broadcast Mode | **On** |
-| UDP Port | **20777** |
-| UDP Format | **2025** |
-| Send Rate | **20 Hz** |
+| UDP Telemetry | On |
+| UDP Broadcast Mode | On |
+| UDP Port | 20777 |
 
-> Note: With Broadcast Mode enabled, you don't need to enter an IP address — the ESP8266 will receive the data automatically as long as it's on the same WiFi network.
+![F1 25 telemetry settings](read-me-images/f1-settings.jpg)
 
----
-
-## Step 5 — Verify it works
-
-1. Connect the ESP8266 via USB
-2. Open the **Serial Monitor** in Arduino IDE (baud rate: `115200`)
-3. The IP address will appear once the ESP8266 is connected to WiFi
-4. Start a race in F1 25
-5. The Serial Monitor will show `Weather: 0` (or another number)
-6. The LED strip changes colour based on the weather in your race
+> See the disclaimer at the top of this README before changing these settings.
 
 ---
 
-## Weather values and colours
-
-| Value | Weather | LED colour |
-|---|---|---|
-| `0` | Clear | Warm yellow |
-| `1` | Light cloud | Light gray |
-| `2` | Overcast | Dark gray |
-| `3` | Light rain | Light blue |
-| `4` | Heavy rain | Dark blue |
-| `5` | Storm | Purple |
-
----
-
-## Troubleshooting
-
-**The strip does nothing:**
-- Check that the DATA cable is connected to `D1`
-- Make sure `NUM_LEDS` matches the number of LEDs on your strip
-
-**Serial Monitor shows no weather data:**
-- Make sure F1 25 and the ESP8266 are on the same WiFi network
-- Ensure Broadcast Mode is set to **On** in F1 25
-- Check that port `20777` is not blocked by a firewall
-
-**WiFi won't connect:**
-- Double-check your SSID and password in the code
-- The ESP8266 only supports **2.4 GHz** WiFi, not 5 GHz
-
----
-
-## File structure
+## Folder structure
 
 ```
-project/
-├── f1_weather_strip/
-│   └── f1_weather_strip.ino   <- Arduino code
+f1_25_udp_ledstrip/
+├── code_files/
+│   └── weather_and_safetycar_led.zip
 ├── libraries/
-│   ├── f1-26-udp/             <- UDP parser library
-│   └── Adafruit_NeoPixel/     <- LED library
-└── README.md                  <- This file
+│   ├── Adafruit_NeoPixel-master.zip
+│   └── f1-25-udp-main.zip
+├── read-me-images/
+│   └── (images used in this README)
+└── README.md
 ```
-
----
-
-## Sources
-
-- [f1-26-udp library (GitHub)](https://github.com/MacManley/f1-26-udp)
-- [EA UDP Specification F1 25](https://forums.ea.com/blog/f1-games-game-info-hub-en/ea-sports%E2%84%A2-f1%C2%AE25-udp-specification/12187347)
-- [Adafruit NeoPixel documentation](https://learn.adafruit.com/adafruit-neopixel-uberguide)
