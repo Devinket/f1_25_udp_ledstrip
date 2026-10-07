@@ -78,16 +78,12 @@ const char *SSID     = "wifi-ssid";      // Name of your 2.4 GHz Wi-Fi network
 const char *Password = "wifi-password";  // Your Wi-Fi password
 ```
 
-![Wi-Fi settings](read-me-images/wifi_settings.jpeg)
-
 Then update the LED strip settings to match your hardware:
 
 ```cpp
 #define LED_PIN   5    // Change to D1 or another pin if needed
 #define LED_COUNT 14   // Change to the number of LEDs on your strip
 ```
-
-![LED strip settings](read-me-images/led_strip_settings.jpeg)
 
 ---
 
@@ -113,19 +109,3 @@ In F1 25, go to **Settings** > **Telemetry Settings** and apply the following:
 ![F1 25 telemetry settings](read-me-images/f1_25_settings.jpeg)
 
 > See the disclaimer at the top of this README before changing these settings.
-
----
-
-## Folder structure
-
-```
-f1_25_udp_ledstrip/
-├── code_files/
-│   └── weather_and_safetycar_led.zip
-├── libraries/
-│   ├── Adafruit_NeoPixel-master.zip
-│   └── f1-25-udp-main.zip
-├── read-me-images/
-│   └── (images used in this README)
-└── README.md
-```
