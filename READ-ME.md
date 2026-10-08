@@ -112,7 +112,6 @@ In F1 25, go to **Settings** > **Telemetry Settings** and apply the following:
 
 
 # Troubleshooting Guide
-## If you run into problems
 
 If you experience issues such as:
 
