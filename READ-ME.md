@@ -109,3 +109,58 @@ In F1 25, go to **Settings** > **Telemetry Settings** and apply the following:
 ![F1 25 telemetry settings](read-me-images/f1_25_settings.jpeg)
 
 > See the disclaimer at the top of this README before changing these settings.
+
+
+# Troubleshooting Guide
+## If you run into problems
+
+If you experience issues such as:
+
+- WiFi connects but the LED strip does nothing
+- The ESP8266 crashes or keeps restarting
+- Weather and safety car data stay at 0 or never change
+
+then:
+
+1. **Check the parser version**  
+   Make sure you installed the **F1 25** parser, not the F1 24 or F1 26 version:
+   - https://github.com/MacManley/f1-25-udp
+
+2. **Test the official example code**  
+   Try one of the examples from the parser repository:
+   - https://github.com/MacManley/f1-25-udp/tree/main/examples
+
+   If the examples do not work, the problem is almost certainly with:
+   - The parser installation (wrong version or wrong folder name), or
+   - The F1 25 game UDP settings.
+
+3. **If the examples work but this project does not, check these basics:**
+
+   - **Upload target**  
+     In Arduino IDE, verify that you are uploading to an ESP8266 board (Tools > Board) and that the correct COM port is selected (Tools > Port).
+
+   - **UDP settings in F1 25**  
+     In the game, under Telemetry/UDP settings:
+     - UDP Telemetry: On
+     - UDP Broadcast Mode: On
+     - UDP Port: 20777
+     - UDP Format: 2025
+     - Send Rate: 10 Hz or higher
+
+   - **WiFi band**  
+     The ESP8266 only supports **2.4 GHz** WiFi. Make sure your router has 2.4 GHz enabled and that the ESP8266 is connected to that band.
+
+   - **Libraries installed**  
+     Confirm that both `F1_25_UDP` and `Adafruit_NeoPixel` are installed and visible under Sketch > Include Library.
+
+   - **LED wiring**  
+     Check that the data pin of the LED strip is connected to D1 (GPIO5), that `LED_COUNT` matches the actual number of LEDs, and that GND of the strip is connected to GND of the ESP8266.
+
+---
+
+
+## Sources
+- [Arduino IDE](https://www.arduino.cc/en/software)
+- [ESP8266 Board Package](https://github.com/esp8266/Arduino)
+- [F1 25 UDP Parser](https://github.com/MacManley/f1-25-udp)
+- [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
